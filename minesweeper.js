@@ -8,7 +8,7 @@ const TILE_STATUSES = {
 const board = [];
 
 export function createBoard(boardSize, numberOfMines) {
-  const minePositions = getMinePositions(boardSize, numberOfMines);
+  const minePositions = createMines(boardSize, numberOfMines);
 
   for (let x = 0; x < boardSize; x++) {
     const row = [];
@@ -40,7 +40,6 @@ export function createBoard(boardSize, numberOfMines) {
   return board;
 }
 
-
 export function markTile(tile) {
   if (tile.status === TILE_STATUSES.MARKED) {
     tile.status = TILE_STATUSES.HIDDEN;
@@ -49,7 +48,7 @@ export function markTile(tile) {
   }
 }
 
-export function minesMarkedCount() {
+export function getMinesMarkedCount() {
   const minesMarked = board.reduce((count, row) => {
     return (
       count +
@@ -61,7 +60,43 @@ export function minesMarkedCount() {
   return minesMarked;
 }
 
-function getMinePositions(boardSize, numberOfMines) {
+export function revealTile(tile) {
+  if (tile.status !== TILE_STATUSES.HIDDEN) {
+    return;
+  }
+
+  if (tile.mine === true) {
+    tile.status = TILE_STATUSES.MINE;
+  }
+
+  tile.status = TILE_STATUSES.NUMBER;
+  const adjacentTiles = getAdjacentTiles(tile);
+  const mines = adjacentTiles.filter((t) => t.mine);
+
+  if (mines.length == 0) {
+    adjacentTiles.forEach(revealTile.bind());
+  } else {
+    tile.element.textContent = mines.length;
+  }
+}
+
+function getAdjacentTiles(tile) {
+  let tiles = [];
+  for (let x = -1; x <= 1; x++) {
+    const row = board[tile.x + x];
+    if (typeof row !== "undefined") {
+      for (let y = -1; y <= 1; y++) {
+        const adjacentTile = row[tile.y + y];
+        if (typeof adjacentTile !== "undefined") {
+          tiles.push(adjacentTile);
+        }
+      }
+    }
+  }
+  return tiles;
+}
+
+function createMines(boardSize, numberOfMines) {
   const positions = [];
   while (positions.length < numberOfMines) {
     const generatedPosition = {
@@ -89,5 +124,3 @@ function isPositionAMatch(randomPosition, listedPosition) {
 function randomNumber(size) {
   return Math.floor(Math.random() * size);
 }
-
-function attachEventListenerForTile() {}
