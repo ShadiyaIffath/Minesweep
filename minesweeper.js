@@ -67,6 +67,7 @@ export function revealTile(tile) {
 
   if (tile.mine === true) {
     tile.status = TILE_STATUSES.MINE;
+    return;
   }
 
   tile.status = TILE_STATUSES.NUMBER;
@@ -78,6 +79,38 @@ export function revealTile(tile) {
   } else {
     tile.element.textContent = mines.length;
   }
+}
+
+export function checkWin(numberOfMines) {
+  if (numberOfMines === getMinesMarkedCount()) {
+    return true;
+  }
+
+  return !board.some((row) =>
+    row.some((tile) => {
+      if (
+        tile.status === TILE_STATUSES.HIDDEN ||
+        tile.status === TILE_STATUSES.MINE
+      )
+        return tile;
+    })
+  );
+}
+
+export function checkLoose() {
+  return board.some((row) =>
+    row.some((tile) => tile.status === TILE_STATUSES.MINE)
+  );
+}
+
+export function revealAllMines() {
+  board.forEach((row) =>
+    row.forEach((tile) => {
+      if (tile.mine) {
+        tile.status = TILE_STATUSES.MINE;
+      }
+    })
+  );
 }
 
 function getAdjacentTiles(tile) {
