@@ -5,8 +5,9 @@ const TILE_STATUSES = {
   NUMBER: "number",
 };
 
+const board = [];
+
 export function createBoard(boardSize, numberOfMines) {
-  const board = [];
   const minePositions = getMinePositions(boardSize, numberOfMines);
 
   for (let x = 0; x < boardSize; x++) {
@@ -37,6 +38,27 @@ export function createBoard(boardSize, numberOfMines) {
   }
 
   return board;
+}
+
+
+export function markTile(tile) {
+  if (tile.status === TILE_STATUSES.MARKED) {
+    tile.status = TILE_STATUSES.HIDDEN;
+  } else if (tile.status === TILE_STATUSES.HIDDEN) {
+    tile.status = TILE_STATUSES.MARKED;
+  }
+}
+
+export function minesMarkedCount() {
+  const minesMarked = board.reduce((count, row) => {
+    return (
+      count +
+      row.filter(
+        (tile) => tile.status === TILE_STATUSES.MARKED && tile.mine === true
+      ).length
+    );
+  }, 0);
+  return minesMarked;
 }
 
 function getMinePositions(boardSize, numberOfMines) {
